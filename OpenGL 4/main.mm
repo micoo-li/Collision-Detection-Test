@@ -19,6 +19,10 @@
 //OpenGL Stuff
 #import <GL/glew.h>
 #import <GLFW/glfw3.h>
+#import <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#import <glm/gtc/type_ptr.hpp>
+
 
 //Namespace
 using namespace std;
@@ -42,9 +46,29 @@ unsigned int verticesVBO;
 unsigned int colorVBO;
 unsigned int vao;
 unsigned int shaderProgram;
+
+//Uniform Variables
+unsigned int viewMatrixUniform;
+unsigned int projectionMatrixUniform;
+
+
+glm::mat4 translateMatrix;
+glm::mat4 rotateMatrix;
+
+glm::mat4 projectionMatrix;
+
+
+
 // keep track of window size for things like the viewport and the mouse cursor
 int g_gl_width = 640;
 int g_gl_height = 480;
+
+//Camera Variables
+float camSpeed = 1; //Camera Speed
+float camYawSpeed = 10; //Degrees per second
+
+float camPosition[] = {0, 0, 2}; //Self-explanatory
+float camYaw = 0; //O Degrees
 
 #define GL_LOG_FILE "/Users/michael/Desktop/gl.log"
 
@@ -233,6 +257,8 @@ void initializeWindow()
     window = glfwCreateWindow (640, 480, "OpenGL", NULL, NULL);
 #endif
     
+    glViewport (0, 0, g_gl_width, g_gl_height);
+    
     //Set Current OpenGL Context
     glfwMakeContextCurrent (window);
     
@@ -316,12 +342,29 @@ void compileShaders()
     glLinkProgram(shaderProgram);
 }
 
+void createUniforms()
+{
+    viewMatrixUniform = glGetUniformLocation(shaderProgram, "viewMatrix");
+    projectionMatrixUniform = glGetUniformLocation(shaderProgram, "projectionMatrix");
+    
+    glUseProgram(shaderProgram);
+    
+    translateMatrix = glm::translate(glm::mat4(1.0), glm::vec3(-camPosition[0], -camPosition[1], -camPosition[2]));
+    rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
+    
+    glm::mat4 viewMatrix = rotateMatrix * translateMatrix;
+    
+    projectionMatrix = glm::perspective(67.0f, (float)g_gl_width/(float)g_gl_height, 0.1f, 100.0f);
+    
+    
+    glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+}
+
 int main(int argc, const char * argv[])
 {
     
     @autoreleasepool {
-        
-        
         
         initializeWindow();
         
@@ -335,22 +378,25 @@ int main(int argc, const char * argv[])
         initializeBuffers();
         initializeArrays();
         compileShaders();
+        createUniforms();
         
         //Extra Stuff Calls whatever lol
         
         log_gl_params();
         
+        
         while(!glfwWindowShouldClose(window))
         {
+            static double previous_seconds = glfwGetTime ();
+            double current_seconds = glfwGetTime ();
+            double elapsed_seconds = current_seconds - previous_seconds;
+            previous_seconds = current_seconds;
+            
             //Show FPS on window title, may be inefficient
             calcFPS(1, "OpenGL");
             
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
-            glViewport (0, 0, g_gl_width, g_gl_height);
-            
-            glUseProgram (shaderProgram);
-            glBindVertexArray (vao);
             // draw points 0-3 from the currently bound VAO with current in-use shader
             glDrawArrays (GL_TRIANGLES, 0, 3);
             // update other events like input handling
@@ -359,8 +405,53 @@ int main(int argc, const char * argv[])
             glfwSwapBuffers(window);
             
             //Key Presses
+            bool cam_moved = false;
+            
             if (GLFW_PRESS == glfwGetKey (window, GLFW_KEY_ESCAPE)) {
                 glfwSetWindowShouldClose (window, 1);
+            }
+            else if (glfwGetKey (window, GLFW_KEY_A)) {
+                camPosition[0] -= camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_D)) {
+                camPosition[0] += camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_PAGE_UP)) {
+                camPosition[1] += camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_PAGE_DOWN)) {
+                camPosition[1] -= camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_W)) {
+                camPosition[2] -= camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_S)) {
+                camPosition[2] += camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_LEFT)) {
+                camYaw += camYawSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey (window, GLFW_KEY_RIGHT)) {
+                camYaw -= camYawSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            
+            if (cam_moved)
+            {
+                translateMatrix = glm::translate(glm::mat4(1.0), glm::vec3(-camPosition[0], -camPosition[1], -camPosition[2]));
+                rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
+                
+                glm::mat4 viewMatrix = rotateMatrix * translateMatrix;
+                
+                glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+                
             }
             
         }
