@@ -20,12 +20,21 @@
 #import <GL/glew.h>
 #import <GLFW/glfw3.h>
 #import <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#import <glm/gtc/matrix_transform.hpp>
 #import <glm/gtc/type_ptr.hpp>
-
+#import <glm/gtc/quaternion.hpp>
+#import <glm/gtx/quaternion.hpp>
 
 //Namespace
 using namespace std;
+
+//Preprocessor Functions
+
+#define PI 3.141592653589793238462643383279502884197169399
+
+#define radians(n) n*PI/180
+#define degrees(n) n*180/pi
+
 
 //Vertices
 float points[] = {
@@ -65,7 +74,7 @@ int g_gl_height = 480;
 
 //Camera Variables
 float camSpeed = 1; //Camera Speed
-float camYawSpeed = 10; //Degrees per second
+float camYawSpeed = 190; //Degrees per second
 
 float camPosition[] = {0, 0, 2}; //Self-explanatory
 float camYaw = 0; //O Degrees
@@ -350,7 +359,15 @@ void createUniforms()
     glUseProgram(shaderProgram);
     
     translateMatrix = glm::translate(glm::mat4(1.0), glm::vec3(-camPosition[0], -camPosition[1], -camPosition[2]));
-    rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
+    
+    //Rotate with Matrices
+    //rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
+    
+    //Rotate with Quaternions
+    glm::quat rotateQuaternion;
+    rotateQuaternion = glm::angleAxis(-camYaw, glm::vec3(0, 1, 0));
+    
+    rotateMatrix = glm::toMat4(rotateQuaternion);
     
     glm::mat4 viewMatrix = rotateMatrix * translateMatrix;
     
@@ -446,7 +463,12 @@ int main(int argc, const char * argv[])
             if (cam_moved)
             {
                 translateMatrix = glm::translate(glm::mat4(1.0), glm::vec3(-camPosition[0], -camPosition[1], -camPosition[2]));
-                rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
+                
+                
+                //rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
+                glm::quat rotateQuaternion;
+                rotateQuaternion = glm::angleAxis(-camYaw, glm::vec3(0, 1, 0));
+                rotateMatrix = glm::toMat4(rotateQuaternion);
                 
                 glm::mat4 viewMatrix = rotateMatrix * translateMatrix;
                 
