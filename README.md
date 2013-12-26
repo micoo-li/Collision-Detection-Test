@@ -23,3 +23,15 @@ Switched Rotation method from Matrices to Quaternions: 2013-12-09
   - Quaternions are almost 3 times faster than matrices
   
 
+Used Indices and Added Lighting: 2013-12-26
+- Used Indices (elements) instead
+- Also added simple lighting support (along with normals ofc)
+
+Added Model To Render: 2013-12-26
+- Can now read obj files
+
+
+==============
+Problems
+
+- Don't know how to translate normals from object to world space. Whatever screw it lol close enough

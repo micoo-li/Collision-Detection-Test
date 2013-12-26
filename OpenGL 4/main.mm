@@ -77,18 +77,23 @@ float texcoords[] = {
 //All the shapes in the file
 vector<tinyobj::shape_t> shapes;
 
+float diameter = 2; //Diameter of sphere
 
 //Important variables
-GLint numberOfObjects = 1;
+GLint numberOfObjects = 2;
 
 GLFWwindow *window;
-unsigned int verticesVBO;
-unsigned int normalsVBO;
+unsigned int *verticesVBO;
+unsigned int *normalsVBO;
 unsigned int texturesVBO;
-unsigned int elementsVBO;
+unsigned int *elementsVBO;
 unsigned int colorVBO;
-unsigned int vao;
+unsigned int *vao;
 unsigned int shaderProgram;
+
+vector<glm::vec3> positions;
+vector<glm::vec3> velocity;
+
 
 unsigned int tex = 0;
 
@@ -290,45 +295,45 @@ void loadObj()
         cerr << err << endl;
         exit(1);
     }
+    
+    cout << "# of shapes : " << shapes.size() << std::endl;
     /*
-     cout << "# of shapes : " << shapes.size() << std::endl;
-     
-     for (size_t i = 0; i < shapes.size(); i++) {
-     printf("shape[%ld].name = %s\n", i, shapes[i].name.c_str());
-     printf("shape[%ld].indices: %ld\n", i, shapes[i].mesh.indices.size());
-     assert((shapes[i].mesh.indices.size() % 3) == 0);
-     for (size_t f = 0; f < shapes[i].mesh.indices.size(); f++) {
-     printf("  idx[%ld] = %d\n", f, shapes[i].mesh.indices[f]);
-     }
-     
-     printf("shape[%ld].vertices: %ld\n", i, shapes[i].mesh.positions.size());
-     assert((shapes[i].mesh.positions.size() % 3) == 0);
-     for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; v++) {
-     printf("  v[%ld] = (%f, %f, %f)\n", v,
-     shapes[i].mesh.positions[3*v+0],
-     shapes[i].mesh.positions[3*v+1],
-     shapes[i].mesh.positions[3*v+2]);
-     }
-     
-     printf("shape[%ld].material.name = %s\n", i, shapes[i].material.name.c_str());
-     printf("  material.Ka = (%f, %f ,%f)\n", shapes[i].material.ambient[0], shapes[i].material.ambient[1], shapes[i].material.ambient[2]);
-     printf("  material.Kd = (%f, %f ,%f)\n", shapes[i].material.diffuse[0], shapes[i].material.diffuse[1], shapes[i].material.diffuse[2]);
-     printf("  material.Ks = (%f, %f ,%f)\n", shapes[i].material.specular[0], shapes[i].material.specular[1], shapes[i].material.specular[2]);
-     printf("  material.Tr = (%f, %f ,%f)\n", shapes[i].material.transmittance[0], shapes[i].material.transmittance[1], shapes[i].material.transmittance[2]);
-     printf("  material.Ke = (%f, %f ,%f)\n", shapes[i].material.emission[0], shapes[i].material.emission[1], shapes[i].material.emission[2]);
-     printf("  material.Ns = %f\n", shapes[i].material.shininess);
-     printf("  material.map_Ka = %s\n", shapes[i].material.ambient_texname.c_str());
-     printf("  material.map_Kd = %s\n", shapes[i].material.diffuse_texname.c_str());
-     printf("  material.map_Ks = %s\n", shapes[i].material.specular_texname.c_str());
-     printf("  material.map_Ns = %s\n", shapes[i].material.normal_texname.c_str());
-     std::map<std::string, std::string>::iterator it(shapes[i].material.unknown_parameter.begin());
-     std::map<std::string, std::string>::iterator itEnd(shapes[i].material.unknown_parameter.end());
-     for (; it != itEnd; it++) {
-     printf("  material.%s = %s\n", it->first.c_str(), it->second.c_str());
-     }
-     printf("\n");
-     }
-     */
+    for (size_t i = 0; i < shapes.size(); i++) {
+        printf("shape[%ld].name = %s\n", i, shapes[i].name.c_str());
+        printf("shape[%ld].indices: %ld\n", i, shapes[i].mesh.indices.size());
+        assert((shapes[i].mesh.indices.size() % 3) == 0);
+        for (size_t f = 0; f < shapes[i].mesh.indices.size(); f++) {
+            printf("  idx[%ld] = %d\n", f, shapes[i].mesh.indices[f]);
+        }
+        
+        printf("shape[%ld].vertices: %ld\n", i, shapes[i].mesh.positions.size());
+        assert((shapes[i].mesh.positions.size() % 3) == 0);
+        for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; v++) {
+            printf("  v[%ld] = (%f, %f, %f)\n", v,
+                   shapes[i].mesh.positions[3*v+0],
+                   shapes[i].mesh.positions[3*v+1],
+                   shapes[i].mesh.positions[3*v+2]);
+        }
+        
+        printf("shape[%ld].material.name = %s\n", i, shapes[i].material.name.c_str());
+        printf("  material.Ka = (%f, %f ,%f)\n", shapes[i].material.ambient[0], shapes[i].material.ambient[1], shapes[i].material.ambient[2]);
+        printf("  material.Kd = (%f, %f ,%f)\n", shapes[i].material.diffuse[0], shapes[i].material.diffuse[1], shapes[i].material.diffuse[2]);
+        printf("  material.Ks = (%f, %f ,%f)\n", shapes[i].material.specular[0], shapes[i].material.specular[1], shapes[i].material.specular[2]);
+        printf("  material.Tr = (%f, %f ,%f)\n", shapes[i].material.transmittance[0], shapes[i].material.transmittance[1], shapes[i].material.transmittance[2]);
+        printf("  material.Ke = (%f, %f ,%f)\n", shapes[i].material.emission[0], shapes[i].material.emission[1], shapes[i].material.emission[2]);
+        printf("  material.Ns = %f\n", shapes[i].material.shininess);
+        printf("  material.map_Ka = %s\n", shapes[i].material.ambient_texname.c_str());
+        printf("  material.map_Kd = %s\n", shapes[i].material.diffuse_texname.c_str());
+        printf("  material.map_Ks = %s\n", shapes[i].material.specular_texname.c_str());
+        printf("  material.map_Ns = %s\n", shapes[i].material.normal_texname.c_str());
+        std::map<std::string, std::string>::iterator it(shapes[i].material.unknown_parameter.begin());
+        std::map<std::string, std::string>::iterator itEnd(shapes[i].material.unknown_parameter.end());
+        for (; it != itEnd; it++) {
+            printf("  material.%s = %s\n", it->first.c_str(), it->second.c_str());
+        }
+        printf("\n");
+    }
+    */
 }
 
 void initializeWindow()
@@ -375,6 +380,17 @@ void initializeWindow()
     const GLubyte* version = glGetString (GL_VERSION); // version as a string
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
+    
+    
+    //Positions of the objects, will change later
+    positions.push_back(glm::vec3(-1, 0, 0));
+    positions.push_back(glm::vec3(1, 0, 0));
+    
+    verticesVBO = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
+    normalsVBO = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
+    elementsVBO = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
+    vao = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
+    
 }
 
 void initializeOpenGL()
@@ -409,41 +425,70 @@ void initializeBuffers()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 */
     //Obj Data
-   
-    GetGLError();
-    glGenBuffers(1, &verticesVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-    glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.positions.size() * sizeof(float), &shapes[0].mesh.positions[0],GL_STATIC_DRAW);
     
-    glGenBuffers(1, &normalsVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
-    glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.normals.size() * sizeof(float), &shapes[0].mesh.normals[0], GL_STATIC_DRAW);
-    
-    
-    GetGLError();
-    glGenBuffers(1, &elementsVBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
-    GetGLError();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[0].mesh.indices.size() * sizeof(unsigned int), &shapes[0].mesh.indices[0], GL_STATIC_DRAW);
-    GetGLError();
+    for (int i=0;i<numberOfObjects; i++)
+    {
+        translateMatrix = glm::translate(glm::mat4(1.0), positions[i]);
+        
+        GLfloat *tempPos = (GLfloat *)malloc(shapes[0].mesh.positions.size() * sizeof(GLfloat));
+        //GLfloat *tempNorm = (GLfloat *)malloc(shapes[0].mesh.normals.size() * sizeof(GLfloat));
+        
+        for (int j = 0;j<shapes[0].mesh.positions.size()/3;j++)
+        {
+            tempPos[j*3] = shapes[0].mesh.positions[j*3] + positions[i].x;
+            tempPos[j*3+1] = shapes[0].mesh.positions[j*3+1] + positions[i].y;
+            tempPos[j*3+2] = shapes[0].mesh.positions[j*3+2] + positions[i].z;
+        }
+        /*
+        for (int j=0;j<shapes[0].mesh.normals.size()/3;j++)
+        {
+            tempNorm[j*3] = shapes[0].mesh.normals[j*3] + positions[i].x;
+            tempNorm[j*3+1] = shapes[0].mesh.normals[j*3+1] + positions[i].y;
+            tempNorm[j*3+2] = shapes[0].mesh.normals[j*3+2] + positions[i].z;
+        }
+        */
+        
+        GetGLError();
+        glGenBuffers(1, &verticesVBO[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, verticesVBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.positions.size() * sizeof(float), tempPos,GL_STATIC_DRAW);
+        
+        glGenBuffers(1, &normalsVBO[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, normalsVBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.normals.size() * sizeof(float), &shapes[0].mesh.normals[0], GL_STATIC_DRAW);
+        
+        
+        GetGLError();
+        glGenBuffers(1, &elementsVBO[i]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[i]);
+        GetGLError();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[0].mesh.indices.size() * sizeof(unsigned int), &shapes[0].mesh.indices[0], GL_STATIC_DRAW);
+        GetGLError();
+        
+        free(tempPos);
+        
+    }
 
 }
 
 void initializeArrays()
 {
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-//    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
-  //  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+    for (int i=0;i<numberOfObjects;i++)
+    {
+        glGenVertexArrays(1, &vao[i]);
+        glBindVertexArray(vao[i]);
     
+        glBindBuffer(GL_ARRAY_BUFFER, verticesVBO[i]);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        glBindBuffer(GL_ARRAY_BUFFER, normalsVBO[i]);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        //    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
+        //  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
     
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
 //    glEnableVertexAttribArray(2);
+    }
 }
 
 void initializeTextures()
@@ -524,6 +569,45 @@ void createUniforms()
     glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 }
 
+#pragma mark Collisions
+
+//Example right now, change return value later to a vector or smth, or can make another function
+BOOL collided(int objectOne, int objectTwo)
+{
+    glm::vec3 object1 = positions[objectOne];
+    glm::vec3 object2 = positions[objectTwo];
+    
+    if (sqrt((object1.x-object2.x) * (object1.x-object2.x) + ((object1.y-object2.y)*(object1.y-object2.y) + (object1.z-object2.z)*(object1.z-object2.z))) < diameter)
+    {
+        return YES;
+    }
+    return NO;
+}
+
+void collisionLoops()
+{
+    //Easiest, but inefficient. Has runtime of O(n^2)
+    //Calculate velocity later, ask teacher cuz cbf
+    
+    for (int i=0;i<numberOfObjects;i++)
+    {
+        for (int j=i+1;j<numberOfObjects;j++)
+        {
+            BOOL collide = collided(i, j);
+            if (collide == YES)
+                NSLog (@"There is a collision");
+            else
+                NSLog (@"No Collision in the system");
+        }
+    }
+}
+
+//Octree implementation at http://nomis80.org/code/octree.html
+//Just the data structure, but that's like 90% of the work
+
+
+#pragma mark Main
+
 int main(int argc, const char * argv[])
 {
     
@@ -565,8 +649,12 @@ int main(int argc, const char * argv[])
             
             // draw points 0-3 from the currently bound VAO with current in-use shader
             //glDrawArrays (GL_TRIANGLES, 0, 6);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
-            glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            for (int i=0;i<numberOfObjects;i++)
+            {
+                glBindVertexArray(vao[i]);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[i]);
+                glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            }
             // update other events like input handling
             glfwPollEvents ();
             

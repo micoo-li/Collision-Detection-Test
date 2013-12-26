@@ -30,6 +30,7 @@
 		4CA5AB37186BFFE200ADD3EE /* Sphere.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB35186BFFE200ADD3EE /* Sphere.mtl */; };
 		4CA5AB3A186C020400ADD3EE /* Sphere_Simple.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */; };
 		4CA5AB3B186C020400ADD3EE /* Sphere_Simple.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */; };
+		4CA5AB3D186C148200ADD3EE /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB3C186C148200ADD3EE /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 		4CA5AB35186BFFE200ADD3EE /* Sphere.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere.mtl; sourceTree = "<group>"; };
 		4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Simple.obj; sourceTree = "<group>"; };
 		4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Simple.mtl; sourceTree = "<group>"; };
+		4CA5AB3C186C148200ADD3EE /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				4C8FEBD21848CE4300151239 /* main.mm */,
+				4CA5AB3C186C148200ADD3EE /* README.md */,
 				4CA5AB19186BF3FB00ADD3EE /* Third Party */,
 				4C8FEBCD1848CE4300151239 /* Supporting Files */,
 			);
@@ -277,6 +280,7 @@
 				4C8FEC071848CFF100151239 /* vertex.vsh in Resources */,
 				4CA5AB2A186BF9F100ADD3EE /* Monkey.obj in Resources */,
 				4CA5AB36186BFFE200ADD3EE /* Sphere.obj in Resources */,
+				4CA5AB3D186C148200ADD3EE /* README.md in Resources */,
 				4C316DD31855D16A0025FB09 /* texture.png in Resources */,
 				4CA5AB3A186C020400ADD3EE /* Sphere_Simple.obj in Resources */,
 				4CA5AB37186BFFE200ADD3EE /* Sphere.mtl in Resources */,
