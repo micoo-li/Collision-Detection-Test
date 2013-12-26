@@ -15,6 +15,7 @@
 #include <sstream>
 #include <cmath>
 #include <time.h>
+#include <vector>
 
 //OpenGL Stuff
 #import <GL/glew.h>
@@ -24,6 +25,9 @@
 #import <glm/gtc/type_ptr.hpp>
 #import <glm/gtc/quaternion.hpp>
 #import <glm/gtx/quaternion.hpp>
+
+//My Custom Files
+#import "GLImage.h" //Image Loading
 
 //Namespace
 using namespace std;
@@ -36,27 +40,54 @@ using namespace std;
 #define degrees(n) n*180/pi
 
 
-//Vertices
 float points[] = {
-    0.0, 0.5, 0.0,
-    0.5, -0.5, 0.0,
-    -0.5, -0.5, 0.0
+    -1, 1, 0,
+    1, -1, 0,
+    -1, -1, 0,
+    1, 1, 0,
 };
 
-float colors[] = {
-    1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0,
+float normals[] = {
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
     0.0, 0.0, 1.0
 };
+
+GLint elements[] = {
+    0, 1, 2,
+    0, 3, 1
+};
+
+float texcoords[] = {
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0, 0.0,
+    
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0
+};
+
+
 
 //Important variables
 GLFWwindow *window;
 unsigned int verticesVBO;
+unsigned int normalsVBO;
+unsigned int texturesVBO;
+unsigned int elementsVBO;
 unsigned int colorVBO;
 unsigned int vao;
 unsigned int shaderProgram;
 
+unsigned int tex = 0;
+
 //Uniform Variables
+unsigned int modelMatrixUniform;
 unsigned int viewMatrixUniform;
 unsigned int projectionMatrixUniform;
 
@@ -291,20 +322,30 @@ void initializeOpenGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
 }
 
 void initializeBuffers()
 {
+    NSLog (@"%lu, %lu", sizeof(points), sizeof(GLfloat));
     glGenBuffers(1, &verticesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), points, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
     
-    glGenBuffers(1, &colorVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colors, GL_STATIC_DRAW);
+    glGenBuffers(1, &normalsVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &texturesVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
+    glBufferData(GL_ARRAY_BUFFER, 2 * 6 * sizeof(float), texcoords, GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &elementsVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
 }
 
 void initializeArrays()
@@ -313,12 +354,35 @@ void initializeArrays()
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
     
     
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+}
+
+void initializeTextures()
+{
+    glGenTextures(1, &tex);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    
+    GLImage *image = [GLImage imageWithImageName:@"texture" shouldFlip:NO];
+
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA8, GL_UNSIGNED_INT_8_8_8_8, image.data);
+    
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, image.width);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
 #define VSH_FILENAME [[NSBundle mainBundle] pathForResource:@"vertex" ofType:@"vsh"]
@@ -346,13 +410,15 @@ void compileShaders()
     
     //Bind Attributes
     glBindAttribLocation(shaderProgram, 0, "vertexPosition");
-    glBindAttribLocation(shaderProgram, 1, "vertexColor");
+    glBindAttribLocation(shaderProgram, 1, "vertexNormal");
+    glBindAttribLocation(shaderProgram, 2, "vertexTexcoords");
     
     glLinkProgram(shaderProgram);
 }
 
 void createUniforms()
 {
+    modelMatrixUniform = glGetUniformLocation(shaderProgram, "modelMatrix");
     viewMatrixUniform = glGetUniformLocation(shaderProgram, "viewMatrix");
     projectionMatrixUniform = glGetUniformLocation(shaderProgram, "projectionMatrix");
     
@@ -369,12 +435,11 @@ void createUniforms()
     
     rotateMatrix = glm::toMat4(rotateQuaternion);
     
-    glm::mat4 viewMatrix = rotateMatrix * translateMatrix;
     
     projectionMatrix = glm::perspective(67.0f, (float)g_gl_width/(float)g_gl_height, 0.1f, 100.0f);
     
-    
-    glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(translateMatrix));
+    glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(rotateMatrix));
     glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 }
 
@@ -382,7 +447,6 @@ int main(int argc, const char * argv[])
 {
     
     @autoreleasepool {
-        
         initializeWindow();
         
         char message[256];
@@ -394,6 +458,7 @@ int main(int argc, const char * argv[])
         initializeOpenGL();
         initializeBuffers();
         initializeArrays();
+        initializeTextures();
         compileShaders();
         createUniforms();
         
@@ -415,7 +480,9 @@ int main(int argc, const char * argv[])
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
             // draw points 0-3 from the currently bound VAO with current in-use shader
-            glDrawArrays (GL_TRIANGLES, 0, 3);
+            //glDrawArrays (GL_TRIANGLES, 0, 6);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             // update other events like input handling
             glfwPollEvents ();
             
@@ -465,14 +532,12 @@ int main(int argc, const char * argv[])
                 translateMatrix = glm::translate(glm::mat4(1.0), glm::vec3(-camPosition[0], -camPosition[1], -camPosition[2]));
                 
                 
-                //rotateMatrix = glm::rotate(glm::mat4(1.0), -camYaw, glm::vec3(0, 1, 0));
                 glm::quat rotateQuaternion;
                 rotateQuaternion = glm::angleAxis(-camYaw, glm::vec3(0, 1, 0));
                 rotateMatrix = glm::toMat4(rotateQuaternion);
                 
-                glm::mat4 viewMatrix = rotateMatrix * translateMatrix;
-                
-                glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+                glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(translateMatrix));
+                glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(rotateMatrix));
                 
             }
             

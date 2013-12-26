@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C316DCE1855C1070025FB09 /* GLImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C316DCD1855C1070025FB09 /* GLImage.m */; };
+		4C316DD31855D16A0025FB09 /* texture.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C316DD21855D16A0025FB09 /* texture.png */; };
 		4C8FEBC71848CE4300151239 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEBC61848CE4300151239 /* Cocoa.framework */; };
 		4C8FEBD31848CE4300151239 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4C8FEBD21848CE4300151239 /* main.mm */; };
 		4C8FEBE61848CE4300151239 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEBE51848CE4300151239 /* XCTest.framework */; };
@@ -30,6 +32,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C316DCC1855C1070025FB09 /* GLImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLImage.h; sourceTree = "<group>"; };
+		4C316DCD1855C1070025FB09 /* GLImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLImage.m; sourceTree = "<group>"; };
+		4C316DD21855D16A0025FB09 /* texture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = texture.png; sourceTree = "<group>"; };
 		4C8FEBC31848CE4300151239 /* OpenGL 4.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenGL 4.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C8FEBC61848CE4300151239 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		4C8FEBC91848CE4300151239 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -70,6 +75,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C316DD11855C9A90025FB09 /* Textures */ = {
+			isa = PBXGroup;
+			children = (
+				4C316DD21855D16A0025FB09 /* texture.png */,
+			);
+			name = Textures;
+			sourceTree = "<group>";
+		};
 		4C8FEBBA1848CE4300151239 = {
 			isa = PBXGroup;
 			children = (
@@ -121,8 +134,11 @@
 		4C8FEBCD1848CE4300151239 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4C316DD11855C9A90025FB09 /* Textures */,
 				4C8FEC081848D83F00151239 /* libglfw3.a */,
 				4C8FEBD21848CE4300151239 /* main.mm */,
+				4C316DCC1855C1070025FB09 /* GLImage.h */,
+				4C316DCD1855C1070025FB09 /* GLImage.m */,
 				4C8FEC031848CFAE00151239 /* vertex.vsh */,
 				4C8FEC021848CFAE00151239 /* fragment.fsh */,
 				4C8FEBFE1848CE9500151239 /* glew.c */,
@@ -208,6 +224,7 @@
 			files = (
 				4C8FEC061848CFEE00151239 /* fragment.fsh in Resources */,
 				4C8FEC071848CFF100151239 /* vertex.vsh in Resources */,
+				4C316DD31855D16A0025FB09 /* texture.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +242,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C316DCE1855C1070025FB09 /* GLImage.m in Sources */,
 				4C8FEC001848CE9500151239 /* glew.c in Sources */,
 				4C8FEBD31848CE4300151239 /* main.mm in Sources */,
 			);
