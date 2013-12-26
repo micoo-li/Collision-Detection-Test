@@ -6,6 +6,15 @@
 //  Copyright (c) 2013 michael. All rights reserved.
 //
 
+//OpenGL Stuff
+#import <GL/glew.h>
+#import <GLFW/glfw3.h>
+#import <glm/glm.hpp>
+#import <glm/gtc/matrix_transform.hpp>
+#import <glm/gtc/type_ptr.hpp>
+#import <glm/gtc/quaternion.hpp>
+#import <glm/gtx/quaternion.hpp>
+
 //Apple Stuff
 #import <Cocoa/Cocoa.h>
 
@@ -17,16 +26,9 @@
 #include <time.h>
 #include <vector>
 
-//OpenGL Stuff
-#import <GL/glew.h>
-#import <GLFW/glfw3.h>
-#import <glm/glm.hpp>
-#import <glm/gtc/matrix_transform.hpp>
-#import <glm/gtc/type_ptr.hpp>
-#import <glm/gtc/quaternion.hpp>
-#import <glm/gtx/quaternion.hpp>
-
 //My Custom Files
+#include "tiny_obj_loader.h"
+#include "GLUtil.h"
 #import "GLImage.h" //Image Loading
 
 //Namespace
@@ -72,9 +74,13 @@ float texcoords[] = {
     0.0, 1.0
 };
 
+//All the shapes in the file
+vector<tinyobj::shape_t> shapes;
 
 
 //Important variables
+GLint numberOfObjects = 1;
+
 GLFWwindow *window;
 unsigned int verticesVBO;
 unsigned int normalsVBO;
@@ -271,6 +277,60 @@ double calcFPS(double theTimeInterval = 1.0, std::string theWindowTitle = "NONE"
 }
 
 #pragma mark Initialization Functions
+
+void loadObj()
+{
+    //Load OBJ File, aka the sphere
+    
+    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere_Simple" ofType:@"obj"];
+    
+    string err = tinyobj::LoadObj(shapes, [input UTF8String], [[input stringByDeletingLastPathComponent] UTF8String]);
+    if (!err.empty())
+    {
+        cerr << err << endl;
+        exit(1);
+    }
+    /*
+     cout << "# of shapes : " << shapes.size() << std::endl;
+     
+     for (size_t i = 0; i < shapes.size(); i++) {
+     printf("shape[%ld].name = %s\n", i, shapes[i].name.c_str());
+     printf("shape[%ld].indices: %ld\n", i, shapes[i].mesh.indices.size());
+     assert((shapes[i].mesh.indices.size() % 3) == 0);
+     for (size_t f = 0; f < shapes[i].mesh.indices.size(); f++) {
+     printf("  idx[%ld] = %d\n", f, shapes[i].mesh.indices[f]);
+     }
+     
+     printf("shape[%ld].vertices: %ld\n", i, shapes[i].mesh.positions.size());
+     assert((shapes[i].mesh.positions.size() % 3) == 0);
+     for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; v++) {
+     printf("  v[%ld] = (%f, %f, %f)\n", v,
+     shapes[i].mesh.positions[3*v+0],
+     shapes[i].mesh.positions[3*v+1],
+     shapes[i].mesh.positions[3*v+2]);
+     }
+     
+     printf("shape[%ld].material.name = %s\n", i, shapes[i].material.name.c_str());
+     printf("  material.Ka = (%f, %f ,%f)\n", shapes[i].material.ambient[0], shapes[i].material.ambient[1], shapes[i].material.ambient[2]);
+     printf("  material.Kd = (%f, %f ,%f)\n", shapes[i].material.diffuse[0], shapes[i].material.diffuse[1], shapes[i].material.diffuse[2]);
+     printf("  material.Ks = (%f, %f ,%f)\n", shapes[i].material.specular[0], shapes[i].material.specular[1], shapes[i].material.specular[2]);
+     printf("  material.Tr = (%f, %f ,%f)\n", shapes[i].material.transmittance[0], shapes[i].material.transmittance[1], shapes[i].material.transmittance[2]);
+     printf("  material.Ke = (%f, %f ,%f)\n", shapes[i].material.emission[0], shapes[i].material.emission[1], shapes[i].material.emission[2]);
+     printf("  material.Ns = %f\n", shapes[i].material.shininess);
+     printf("  material.map_Ka = %s\n", shapes[i].material.ambient_texname.c_str());
+     printf("  material.map_Kd = %s\n", shapes[i].material.diffuse_texname.c_str());
+     printf("  material.map_Ks = %s\n", shapes[i].material.specular_texname.c_str());
+     printf("  material.map_Ns = %s\n", shapes[i].material.normal_texname.c_str());
+     std::map<std::string, std::string>::iterator it(shapes[i].material.unknown_parameter.begin());
+     std::map<std::string, std::string>::iterator itEnd(shapes[i].material.unknown_parameter.end());
+     for (; it != itEnd; it++) {
+     printf("  material.%s = %s\n", it->first.c_str(), it->second.c_str());
+     }
+     printf("\n");
+     }
+     */
+}
+
 void initializeWindow()
 {
     if (!glfwInit ()) {
@@ -329,6 +389,8 @@ void initializeOpenGL()
 
 void initializeBuffers()
 {
+ /*
+    //Test Data
     NSLog (@"%lu, %lu", sizeof(points), sizeof(GLfloat));
     glGenBuffers(1, &verticesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
@@ -338,13 +400,32 @@ void initializeBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
     
-    glGenBuffers(1, &texturesVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
-    glBufferData(GL_ARRAY_BUFFER, 2 * 6 * sizeof(float), texcoords, GL_STATIC_DRAW);
+ //   glGenBuffers(1, &texturesVBO);
+ //   glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
+ //   glBufferData(GL_ARRAY_BUFFER, 2 * 6 * sizeof(float), texcoords, GL_STATIC_DRAW);
     
     glGenBuffers(1, &elementsVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+*/
+    //Obj Data
+   
+    GetGLError();
+    glGenBuffers(1, &verticesVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
+    glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.positions.size() * sizeof(float), &shapes[0].mesh.positions[0],GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &normalsVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
+    glBufferData(GL_ARRAY_BUFFER, shapes[0].mesh.normals.size() * sizeof(float), &shapes[0].mesh.normals[0], GL_STATIC_DRAW);
+    
+    
+    GetGLError();
+    glGenBuffers(1, &elementsVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
+    GetGLError();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[0].mesh.indices.size() * sizeof(unsigned int), &shapes[0].mesh.indices[0], GL_STATIC_DRAW);
+    GetGLError();
 
 }
 
@@ -356,13 +437,13 @@ void initializeArrays()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+//    glBindBuffer(GL_ARRAY_BUFFER, texturesVBO);
+  //  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
     
     
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
+//    glEnableVertexAttribArray(2);
 }
 
 void initializeTextures()
@@ -411,7 +492,7 @@ void compileShaders()
     //Bind Attributes
     glBindAttribLocation(shaderProgram, 0, "vertexPosition");
     glBindAttribLocation(shaderProgram, 1, "vertexNormal");
-    glBindAttribLocation(shaderProgram, 2, "vertexTexcoords");
+    //glBindAttribLocation(shaderProgram, 2, "vertexTexcoords");
     
     glLinkProgram(shaderProgram);
 }
@@ -447,6 +528,9 @@ int main(int argc, const char * argv[])
 {
     
     @autoreleasepool {
+        
+        loadObj();
+        
         initializeWindow();
         
         char message[256];
@@ -458,7 +542,7 @@ int main(int argc, const char * argv[])
         initializeOpenGL();
         initializeBuffers();
         initializeArrays();
-        initializeTextures();
+        //initializeTextures();
         compileShaders();
         createUniforms();
         
@@ -482,7 +566,7 @@ int main(int argc, const char * argv[])
             // draw points 0-3 from the currently bound VAO with current in-use shader
             //glDrawArrays (GL_TRIANGLES, 0, 6);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
             // update other events like input handling
             glfwPollEvents ();
             

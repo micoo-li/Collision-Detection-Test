@@ -1,7 +1,7 @@
 #version 330
 
 in vec3 positionEye, normalEye;
-in vec2 texcoords;
+//in vec2 texcoords;
 out vec4 frag_color;
 
 

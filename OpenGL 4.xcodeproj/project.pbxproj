@@ -15,10 +15,21 @@
 		4C8FEBE71848CE4300151239 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEBC61848CE4300151239 /* Cocoa.framework */; };
 		4C8FEBFB1848CE8200151239 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEBFA1848CE8200151239 /* IOKit.framework */; };
 		4C8FEBFD1848CE8800151239 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEBFC1848CE8800151239 /* OpenGL.framework */; };
-		4C8FEC001848CE9500151239 /* glew.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C8FEBFE1848CE9500151239 /* glew.c */; };
 		4C8FEC061848CFEE00151239 /* fragment.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 4C8FEC021848CFAE00151239 /* fragment.fsh */; };
 		4C8FEC071848CFF100151239 /* vertex.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 4C8FEC031848CFAE00151239 /* vertex.vsh */; };
 		4C8FEC091848D83F00151239 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEC081848D83F00151239 /* libglfw3.a */; };
+		4CA5AB15186BF30900ADD3EE /* glew.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5AB14186BF30900ADD3EE /* glew.c */; };
+		4CA5AB18186BF3EF00ADD3EE /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5AB16186BF3EF00ADD3EE /* tiny_obj_loader.cc */; };
+		4CA5AB22186BF61400ADD3EE /* Box.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB20186BF61400ADD3EE /* Box.obj */; };
+		4CA5AB23186BF61400ADD3EE /* Box.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB21186BF61400ADD3EE /* Box.mtl */; };
+		4CA5AB2A186BF9F100ADD3EE /* Monkey.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB28186BF9F100ADD3EE /* Monkey.obj */; };
+		4CA5AB2B186BF9F100ADD3EE /* Monkey.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB29186BF9F100ADD3EE /* Monkey.mtl */; };
+		4CA5AB32186BFDD400ADD3EE /* RandomShape.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB30186BFDD400ADD3EE /* RandomShape.mtl */; };
+		4CA5AB33186BFDD500ADD3EE /* RandomShape.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB31186BFDD400ADD3EE /* RandomShape.obj */; };
+		4CA5AB36186BFFE200ADD3EE /* Sphere.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB34186BFFE200ADD3EE /* Sphere.obj */; };
+		4CA5AB37186BFFE200ADD3EE /* Sphere.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB35186BFFE200ADD3EE /* Sphere.mtl */; };
+		4CA5AB3A186C020400ADD3EE /* Sphere_Simple.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */; };
+		4CA5AB3B186C020400ADD3EE /* Sphere_Simple.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,10 +56,23 @@
 		4C8FEBE51848CE4300151239 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4C8FEBFA1848CE8200151239 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		4C8FEBFC1848CE8800151239 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		4C8FEBFE1848CE9500151239 /* glew.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glew.c; sourceTree = "<group>"; };
 		4C8FEC021848CFAE00151239 /* fragment.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fragment.fsh; sourceTree = "<group>"; };
 		4C8FEC031848CFAE00151239 /* vertex.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = vertex.vsh; sourceTree = "<group>"; };
 		4C8FEC081848D83F00151239 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libglfw3.a; sourceTree = "<group>"; };
+		4CA5AB14186BF30900ADD3EE /* glew.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glew.c; sourceTree = "<group>"; };
+		4CA5AB16186BF3EF00ADD3EE /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
+		4CA5AB17186BF3EF00ADD3EE /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
+		4CA5AB1F186BF45A00ADD3EE /* GLUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLUtil.h; sourceTree = "<group>"; };
+		4CA5AB20186BF61400ADD3EE /* Box.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Box.obj; sourceTree = "<group>"; };
+		4CA5AB21186BF61400ADD3EE /* Box.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Box.mtl; sourceTree = "<group>"; };
+		4CA5AB28186BF9F100ADD3EE /* Monkey.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Monkey.obj; sourceTree = "<group>"; };
+		4CA5AB29186BF9F100ADD3EE /* Monkey.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Monkey.mtl; sourceTree = "<group>"; };
+		4CA5AB30186BFDD400ADD3EE /* RandomShape.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RandomShape.mtl; sourceTree = "<group>"; };
+		4CA5AB31186BFDD400ADD3EE /* RandomShape.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RandomShape.obj; sourceTree = "<group>"; };
+		4CA5AB34186BFFE200ADD3EE /* Sphere.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere.obj; sourceTree = "<group>"; };
+		4CA5AB35186BFFE200ADD3EE /* Sphere.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere.mtl; sourceTree = "<group>"; };
+		4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Simple.obj; sourceTree = "<group>"; };
+		4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Simple.mtl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +150,8 @@
 		4C8FEBCC1848CE4300151239 /* OpenGL 4 */ = {
 			isa = PBXGroup;
 			children = (
+				4C8FEBD21848CE4300151239 /* main.mm */,
+				4CA5AB19186BF3FB00ADD3EE /* Third Party */,
 				4C8FEBCD1848CE4300151239 /* Supporting Files */,
 			);
 			path = "OpenGL 4";
@@ -134,16 +160,35 @@
 		4C8FEBCD1848CE4300151239 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */,
+				4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */,
+				4CA5AB34186BFFE200ADD3EE /* Sphere.obj */,
+				4CA5AB35186BFFE200ADD3EE /* Sphere.mtl */,
+				4CA5AB30186BFDD400ADD3EE /* RandomShape.mtl */,
+				4CA5AB31186BFDD400ADD3EE /* RandomShape.obj */,
+				4CA5AB28186BF9F100ADD3EE /* Monkey.obj */,
+				4CA5AB29186BF9F100ADD3EE /* Monkey.mtl */,
+				4CA5AB20186BF61400ADD3EE /* Box.obj */,
+				4CA5AB21186BF61400ADD3EE /* Box.mtl */,
 				4C316DD11855C9A90025FB09 /* Textures */,
 				4C8FEC081848D83F00151239 /* libglfw3.a */,
-				4C8FEBD21848CE4300151239 /* main.mm */,
 				4C316DCC1855C1070025FB09 /* GLImage.h */,
 				4C316DCD1855C1070025FB09 /* GLImage.m */,
 				4C8FEC031848CFAE00151239 /* vertex.vsh */,
 				4C8FEC021848CFAE00151239 /* fragment.fsh */,
-				4C8FEBFE1848CE9500151239 /* glew.c */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4CA5AB19186BF3FB00ADD3EE /* Third Party */ = {
+			isa = PBXGroup;
+			children = (
+				4CA5AB1F186BF45A00ADD3EE /* GLUtil.h */,
+				4CA5AB16186BF3EF00ADD3EE /* tiny_obj_loader.cc */,
+				4CA5AB17186BF3EF00ADD3EE /* tiny_obj_loader.h */,
+				4CA5AB14186BF30900ADD3EE /* glew.c */,
+			);
+			name = "Third Party";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -222,9 +267,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CA5AB33186BFDD500ADD3EE /* RandomShape.obj in Resources */,
+				4CA5AB23186BF61400ADD3EE /* Box.mtl in Resources */,
+				4CA5AB2B186BF9F100ADD3EE /* Monkey.mtl in Resources */,
+				4CA5AB32186BFDD400ADD3EE /* RandomShape.mtl in Resources */,
 				4C8FEC061848CFEE00151239 /* fragment.fsh in Resources */,
+				4CA5AB3B186C020400ADD3EE /* Sphere_Simple.mtl in Resources */,
+				4CA5AB22186BF61400ADD3EE /* Box.obj in Resources */,
 				4C8FEC071848CFF100151239 /* vertex.vsh in Resources */,
+				4CA5AB2A186BF9F100ADD3EE /* Monkey.obj in Resources */,
+				4CA5AB36186BFFE200ADD3EE /* Sphere.obj in Resources */,
 				4C316DD31855D16A0025FB09 /* texture.png in Resources */,
+				4CA5AB3A186C020400ADD3EE /* Sphere_Simple.obj in Resources */,
+				4CA5AB37186BFFE200ADD3EE /* Sphere.mtl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,8 +298,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C316DCE1855C1070025FB09 /* GLImage.m in Sources */,
-				4C8FEC001848CE9500151239 /* glew.c in Sources */,
 				4C8FEBD31848CE4300151239 /* main.mm in Sources */,
+				4CA5AB18186BF3EF00ADD3EE /* tiny_obj_loader.cc in Sources */,
+				4CA5AB15186BF30900ADD3EE /* glew.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,9 +399,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glew/include\"",
 					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glfw-3.0.3/include\"",
 					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glm\"",
+					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glew-1.10.0/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -365,9 +421,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glew/include\"",
 					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glfw-3.0.3/include\"",
 					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glm\"",
+					"\"$(SRCROOT)/../../../../Source Code/OpenGL/thirdparty/glew-1.10.0/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
