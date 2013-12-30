@@ -29,7 +29,6 @@
 //My Custom Files
 #include "tiny_obj_loader.h"
 #include "GLUtil.h"
-#import "GLImage.h" //Image Loading
 
 //Namespace
 using namespace std;
@@ -41,7 +40,9 @@ using namespace std;
 #define radians(n) n*PI/180
 #define degrees(n) n*180/pi
 
+#define PRINT_ARRAY(a, s) for(int i=0;i<s;i++){printf("%i: %.1f\n", i, (float)a[i]);}
 
+//Test Vertices, don't really need them anymore
 float points[] = {
     -1, 1, 0,
     1, -1, 0,
@@ -77,7 +78,13 @@ float texcoords[] = {
 //All the shapes in the file
 vector<tinyobj::shape_t> shapes;
 
+GLfloat *posVert;
+GLfloat *normalVert;
+GLfloat *indices;
+
+
 float diameter = 2; //Diameter of sphere
+int containerSize = 40; //Size of the box that contains the spheres
 
 //Important variables
 GLint numberOfObjects = 2;
@@ -115,7 +122,7 @@ int g_gl_width = 640;
 int g_gl_height = 480;
 
 //Camera Variables
-float camSpeed = 1; //Camera Speed
+float camSpeed = 3; //Camera Speed
 float camYawSpeed = 190; //Degrees per second
 
 float camPosition[] = {0, 0, 2}; //Self-explanatory
@@ -124,6 +131,7 @@ float camYaw = 0; //O Degrees
 #define GL_LOG_FILE "/Users/michael/Desktop/gl.log"
 
 #define SHOULD_FULLSCREEN 0 //0 for window mode, 1 for fullscreen mode
+#define BATCH_DRAWING 1 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
 
 
 #pragma mark Window Functions
@@ -131,7 +139,7 @@ float camYaw = 0; //O Degrees
 void glfw_window_size_callback (GLFWwindow* window, int width, int height) {
     g_gl_width = width;
     g_gl_height = height;
-    
+    NSLog (@"Test");
     /* update any perspective matrices used here */
 }
 
@@ -287,7 +295,7 @@ void loadObj()
 {
     //Load OBJ File, aka the sphere
     
-    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere_Simple" ofType:@"obj"];
+    NSString *input = [[NSBundle mainBundle] pathForResource:@"Box" ofType:@"obj"];
     
     string err = tinyobj::LoadObj(shapes, [input UTF8String], [[input stringByDeletingLastPathComponent] UTF8String]);
     if (!err.empty())
@@ -357,6 +365,7 @@ void initializeWindow()
 #if SHOULD_FULLSCREEN
     GLFWmonitor* mon = glfwGetPrimaryMonitor ();
     const GLFWvidmode* vmode = glfwGetVideoMode (mon);
+    glfw_window_size_callback(window, vmode->width, vmode->height);
     window = glfwCreateWindow (vmode->width, vmode->height, "Extended GL Init", mon, NULL);
 #else
     window = glfwCreateWindow (640, 480, "OpenGL", NULL, NULL);
@@ -383,14 +392,53 @@ void initializeWindow()
     
     
     //Positions of the objects, will change later
-    positions.push_back(glm::vec3(-1, 0, 0));
-    positions.push_back(glm::vec3(1, 0, 0));
     
+    positions.push_back(glm::vec3(2, 0, -2));
+    positions.push_back(glm::vec3(-2, 0, -2));
+    /*
+    positions.push_back(glm::vec3(-8, 0, 0));
+    positions.push_back(glm::vec3(-8, 4, 0));
+    positions.push_back(glm::vec3(-8, 8, 0));
+    positions.push_back(glm::vec3(-4, -8, 0));
+    positions.push_back(glm::vec3(-4, -4, 0));
+    positions.push_back(glm::vec3(-4, 0, 0));
+    positions.push_back(glm::vec3(-4, 4, 0));
+    positions.push_back(glm::vec3(-4, 8, 0));
+    positions.push_back(glm::vec3(0, -8, 0));
+    positions.push_back(glm::vec3(0, -4, 0));
+    positions.push_back(glm::vec3(0, 0, 0));
+    positions.push_back(glm::vec3(0, 4, 0));
+    positions.push_back(glm::vec3(0, 8, 0));
+    positions.push_back(glm::vec3(4, -8, 0));
+    positions.push_back(glm::vec3(4, -4, 0));
+    positions.push_back(glm::vec3(4, 0, 0));
+    positions.push_back(glm::vec3(4, 4, 0));
+    positions.push_back(glm::vec3(4, 8, 0));
+    positions.push_back(glm::vec3(8, -8, 0));
+    positions.push_back(glm::vec3(8, -4, 0));
+    positions.push_back(glm::vec3(8, 0, 0));
+    positions.push_back(glm::vec3(8, 4, 0));
+    positions.push_back(glm::vec3(8, 8, 0));
+     */
+    /*
+    for (int i=0;i<numberOfObjects;i++)
+    {
+        positions.push_back(glm::vec3(((signed int)arc4random())%containerSize-containerSize/2, ((signed int)arc4random())%containerSize-containerSize/2, ((signed int)arc4random())%containerSize-containerSize/2));
+    }
+    */
+    
+#if !BATCH_DRAWING
+    printf("Not Batch");
     verticesVBO = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
     normalsVBO = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
     elementsVBO = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
     vao = (unsigned int *)malloc(numberOfObjects * sizeof(unsigned int));
-    
+#else
+    verticesVBO = (unsigned int *)malloc(sizeof(unsigned int));
+    normalsVBO = (unsigned int *)malloc(sizeof(unsigned int));
+    elementsVBO = (unsigned int *)malloc(sizeof(unsigned int));
+    vao = (unsigned int *)malloc(sizeof(unsigned int));
+#endif
 }
 
 void initializeOpenGL()
@@ -398,9 +446,9 @@ void initializeOpenGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     
-    //glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
+   // glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
 }
 
 void initializeBuffers()
@@ -425,7 +473,8 @@ void initializeBuffers()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 */
     //Obj Data
-    
+#if !BATCH_DRAWING
+    printf("Not Batch");
     for (int i=0;i<numberOfObjects; i++)
     {
         translateMatrix = glm::translate(glm::mat4(1.0), positions[i]);
@@ -446,7 +495,7 @@ void initializeBuffers()
             tempNorm[j*3+1] = shapes[0].mesh.normals[j*3+1] + positions[i].y;
             tempNorm[j*3+2] = shapes[0].mesh.normals[j*3+2] + positions[i].z;
         }
-        */
+     */
         
         GetGLError();
         glGenBuffers(1, &verticesVBO[i]);
@@ -466,13 +515,63 @@ void initializeBuffers()
         GetGLError();
         
         free(tempPos);
-        
     }
+# else
+    //Single VBO
+    
+    posVert = (GLfloat *)malloc(shapes[0].mesh.positions.size() * sizeof(GLfloat) * numberOfObjects);
+    normalVert = (GLfloat *)malloc(shapes[0].mesh.normals.size() * sizeof(GLfloat)* numberOfObjects);
+    indices = (GLfloat *)malloc(shapes[0].mesh.indices.size() * sizeof(unsigned int) * numberOfObjects);
+    
+    unsigned long posSize = shapes[0].mesh.positions.size();
+    unsigned long normSize = shapes[0].mesh.normals.size();
+    unsigned long indicesSize = shapes[0].mesh.indices.size();
+    
+    for (int i=0;i<numberOfObjects;i++)
+    {
+        for (int j=0;j<posSize/3;j++)
+        {
+            posVert[i*posSize + j*3] = shapes[0].mesh.positions[j*3] + positions[i].x;
+            posVert[i*posSize + j*3 + 1] = shapes[0].mesh.positions[j*3+1] + positions[i].y;
+            posVert[i*posSize + j*3 + 2] = shapes[0].mesh.positions[j*3+2] + positions[i].z;
+        }
+        for (int j=0;j<normSize/3;j++)
+        {
+            //Add translation later lol
+            normalVert[i*posSize + j*3] = shapes[0].mesh.normals[j*3];
+            normalVert[i*posSize + j*3 + 1] = shapes[0].mesh.normals[j*3+1];
+            normalVert[i*posSize + j*3 + 2] = shapes[0].mesh.normals[j*3+2];
+        }
+        for (int j=0;j<indicesSize;j++)
+        {
+            indices[i*indicesSize + j] = shapes[0].mesh.indices[j];
+        }
+    }
+    
+    
+    glGenBuffers(1, &verticesVBO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, verticesVBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, posSize * numberOfObjects * sizeof(GLfloat), posVert, GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &normalsVBO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, normSize * numberOfObjects * sizeof(GLfloat), normalVert, GL_STATIC_DRAW);
+    
+    glGenBuffers(1, &elementsVBO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, elementsVBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, indicesSize * numberOfObjects * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+    PRINT_ARRAY(indices, 72);
+    
+    
+#endif
 
 }
 
 void initializeArrays()
 {
+#if !BATCH_DRAWING
+    
     for (int i=0;i<numberOfObjects;i++)
     {
         glGenVertexArrays(1, &vao[i]);
@@ -487,10 +586,24 @@ void initializeArrays()
     
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-//    glEnableVertexAttribArray(2);
     }
+#else
+    //Single VBO
+    
+    glGenVertexArrays(1, &vao[0]);
+    glBindVertexArray(vao[0]);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, verticesVBO[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, normalsVBO[0]);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+#endif
+    
 }
-
+/*
 void initializeTextures()
 {
     glGenTextures(1, &tex);
@@ -510,7 +623,7 @@ void initializeTextures()
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
-
+*/
 #define VSH_FILENAME [[NSBundle mainBundle] pathForResource:@"vertex" ofType:@"vsh"]
 #define FSH_FILENAME [[NSBundle mainBundle] pathForResource:@"fragment" ofType:@"fsh"]
 
@@ -562,11 +675,16 @@ void createUniforms()
     rotateMatrix = glm::toMat4(rotateQuaternion);
     
     
-    projectionMatrix = glm::perspective(67.0f, (float)g_gl_width/(float)g_gl_height, 0.1f, 100.0f);
+    projectionMatrix = glm::perspective(67.0f, (float)g_gl_width/(float)g_gl_height, 0.1f, 1000.0f);
     
     glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(translateMatrix));
     glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(rotateMatrix));
     glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+}
+
+void updatePositions()
+{
+  
 }
 
 #pragma mark Collisions
@@ -617,44 +735,57 @@ int main(int argc, const char * argv[])
         
         initializeWindow();
         
-        char message[256];
-        sprintf (message, "starting GLFW %s", glfwGetVersionString());
-       // assert (gl_log (message, __FILE__, __LINE__));
-        glfwSetErrorCallback (glfw_error_callback);
+        //char message[256];
+        //sprintf (message, "starting GLFW %s", glfwGetVersionString());
+        //glfwSetErrorCallback (glfw_error_callback);
         
         
         initializeOpenGL();
+        GetGLError();
         initializeBuffers();
+        GetGLError();
         initializeArrays();
-        //initializeTextures();
+        GetGLError();
         compileShaders();
+        GetGLError();
         createUniforms();
-        
+        GetGLError();
         //Extra Stuff Calls whatever lol
         
-        log_gl_params();
+        //log_gl_params();
         
-        
+        GetGLError();
         while(!glfwWindowShouldClose(window))
         {
+            GetGLError();
             static double previous_seconds = glfwGetTime ();
             double current_seconds = glfwGetTime ();
             double elapsed_seconds = current_seconds - previous_seconds;
             previous_seconds = current_seconds;
-            
+            GetGLError();
             //Show FPS on window title, may be inefficient
             calcFPS(1, "OpenGL");
-            
+            GetGLError();
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
-            // draw points 0-3 from the currently bound VAO with current in-use shader
-            //glDrawArrays (GL_TRIANGLES, 0, 6);
+
+            
+#if !BATCH_DRAWING
             for (int i=0;i<numberOfObjects;i++)
             {
                 glBindVertexArray(vao[i]);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[i]);
                 glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
             }
+#else
+            glBindVertexArray(vao[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[0]);
+            glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            //glDrawArrays(GL_TRIANGLES, 0, 72);
+            
+            
+#endif
+            GetGLError();
             // update other events like input handling
             glfwPollEvents ();
             
