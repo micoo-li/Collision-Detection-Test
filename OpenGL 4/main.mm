@@ -80,14 +80,14 @@ vector<tinyobj::shape_t> shapes;
 
 GLfloat *posVert;
 GLfloat *normalVert;
-GLfloat *indices;
+unsigned int *indices;
 
 
 float diameter = 2; //Diameter of sphere
 int containerSize = 40; //Size of the box that contains the spheres
 
 //Important variables
-GLint numberOfObjects = 2;
+GLint numberOfObjects = 1000;
 
 GLFWwindow *window;
 unsigned int *verticesVBO;
@@ -122,7 +122,7 @@ int g_gl_width = 640;
 int g_gl_height = 480;
 
 //Camera Variables
-float camSpeed = 3; //Camera Speed
+float camSpeed = 30; //Camera Speed
 float camYawSpeed = 190; //Degrees per second
 
 float camPosition[] = {0, 0, 2}; //Self-explanatory
@@ -131,7 +131,7 @@ float camYaw = 0; //O Degrees
 #define GL_LOG_FILE "/Users/michael/Desktop/gl.log"
 
 #define SHOULD_FULLSCREEN 0 //0 for window mode, 1 for fullscreen mode
-#define BATCH_DRAWING 1 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
+#define BATCH_DRAWING 0 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
 
 
 #pragma mark Window Functions
@@ -295,7 +295,7 @@ void loadObj()
 {
     //Load OBJ File, aka the sphere
     
-    NSString *input = [[NSBundle mainBundle] pathForResource:@"Box" ofType:@"obj"];
+    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere" ofType:@"obj"];
     
     string err = tinyobj::LoadObj(shapes, [input UTF8String], [[input stringByDeletingLastPathComponent] UTF8String]);
     if (!err.empty())
@@ -392,10 +392,10 @@ void initializeWindow()
     
     
     //Positions of the objects, will change later
-    
-    positions.push_back(glm::vec3(2, 0, -2));
-    positions.push_back(glm::vec3(-2, 0, -2));
     /*
+    positions.push_back(glm::vec3(-2, 0, -2));
+    positions.push_back(glm::vec3(2, 0, -2));
+    
     positions.push_back(glm::vec3(-8, 0, 0));
     positions.push_back(glm::vec3(-8, 4, 0));
     positions.push_back(glm::vec3(-8, 8, 0));
@@ -420,12 +420,11 @@ void initializeWindow()
     positions.push_back(glm::vec3(8, 4, 0));
     positions.push_back(glm::vec3(8, 8, 0));
      */
-    /*
+    
     for (int i=0;i<numberOfObjects;i++)
     {
         positions.push_back(glm::vec3(((signed int)arc4random())%containerSize-containerSize/2, ((signed int)arc4random())%containerSize-containerSize/2, ((signed int)arc4random())%containerSize-containerSize/2));
     }
-    */
     
 #if !BATCH_DRAWING
     printf("Not Batch");
@@ -446,9 +445,9 @@ void initializeOpenGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     
-   // glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 }
 
 void initializeBuffers()
@@ -521,7 +520,7 @@ void initializeBuffers()
     
     posVert = (GLfloat *)malloc(shapes[0].mesh.positions.size() * sizeof(GLfloat) * numberOfObjects);
     normalVert = (GLfloat *)malloc(shapes[0].mesh.normals.size() * sizeof(GLfloat)* numberOfObjects);
-    indices = (GLfloat *)malloc(shapes[0].mesh.indices.size() * sizeof(unsigned int) * numberOfObjects);
+    indices = (unsigned int *)malloc(shapes[0].mesh.indices.size() * sizeof(unsigned int) * numberOfObjects);
     
     unsigned long posSize = shapes[0].mesh.positions.size();
     unsigned long normSize = shapes[0].mesh.normals.size();
@@ -544,7 +543,7 @@ void initializeBuffers()
         }
         for (int j=0;j<indicesSize;j++)
         {
-            indices[i*indicesSize + j] = shapes[0].mesh.indices[j];
+            indices[i*indicesSize + j] = shapes[0].mesh.indices[j]+(unsigned int)(i*posSize/3);
         }
     }
     
@@ -771,17 +770,20 @@ int main(int argc, const char * argv[])
 
             
 #if !BATCH_DRAWING
+            NSLog (@"Start");
             for (int i=0;i<numberOfObjects;i++)
             {
                 glBindVertexArray(vao[i]);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[i]);
                 glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
             }
+            NSLog (@"End");
 #else
+            NSLog (@"Start");
             glBindVertexArray(vao[0]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[0]);
-            glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
-            //glDrawArrays(GL_TRIANGLES, 0, 72);
+            glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size() * numberOfObjects, GL_UNSIGNED_INT, 0);
+            NSLog (@"End");
             
             
 #endif
