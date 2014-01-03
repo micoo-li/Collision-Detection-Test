@@ -17,6 +17,7 @@
 
 //Apple Stuff
 #import <Cocoa/Cocoa.h>
+#import <dispatch/dispatch.h>
 
 //C/C++ Stuff
 #include <iostream>
@@ -34,11 +35,17 @@
 using namespace std;
 
 //Preprocessor Functions
-
 #define PI 3.141592653589793238462643383279502884197169399
 
 #define radians(n) n*PI/180
 #define degrees(n) n*180/pi
+
+//Preprocessor Preferences
+
+#define SHOULD_FULLSCREEN 0 //0 for window mode, 1 for fullscreen mode
+#define BATCH_DRAWING 1 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
+#define COLLISION_CHECK_INTERVAL 10000 //In microseconds (or .000001 seconds)
+//Note: Non batched will not support moving vertices, only implemented for batched
 
 #define PRINT_ARRAY(a, s) for(int i=0;i<s;i++){printf("%i: %.1f\n", i, (float)a[i]);}
 
@@ -89,6 +96,10 @@ unsigned int *indices;
 float diameter = 2; //Diameter of sphere
 int containerSize = 40; //Size of the box that contains the spheres
 
+//GCD (Dispatch) Variables
+dispatch_queue_t collisionQueue;
+dispatch_queue_t drawQueue;
+
 //Important variables
 GLint numberOfObjects = 1000;
 
@@ -135,9 +146,6 @@ float camYaw = 0; //O Degrees
 
 #define GL_LOG_FILE "/Users/michael/Desktop/gl.log"
 
-#define SHOULD_FULLSCREEN 0 //0 for window mode, 1 for fullscreen mode
-#define BATCH_DRAWING 1 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
-//Note: Non batched will not support moving vertices, only implemented for batched
 
 
 #pragma mark Window Functions
@@ -699,11 +707,6 @@ void createUniforms()
     glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 }
 
-void updatePositions()
-{
-  
-}
-
 #pragma mark Collisions
 
 //Example right now, change return value later to a vector or smth, or can make another function
@@ -737,8 +740,76 @@ void collisionLoops()
     }
 }
 
+void checkCollisions() //Main Collision Function
+{
+    unsigned long posSize = shapes[0].mesh.positions.size();
+    
+    static double previous_seconds = glfwGetTime ();
+    double current_seconds = glfwGetTime ();
+    double elapsed_seconds = current_seconds - previous_seconds;
+    
+    
+    printf("Elapsed Seconds: %f\n", elapsed_seconds);
+    
+    previous_seconds = current_seconds;
+    
+    
+    glm::vec3 gravityFrame = gravity * (float)elapsed_seconds;
+    
+    for (int i=0;i<numberOfObjects;i++)
+    {
+        //velocity[i]+=gravityFrame;
+        //Apply gravity to current velocity
+        glm::vec3 tempVelocity = velocity[i]+gravityFrame;
+        
+        
+        //Check for collisions
+        glm::vec3 tempPos = positions[i];
+        
+        tempPos+=tempVelocity;
+        
+        //Flip velocity if it hits the bottom of the container
+        if (tempPos.y<=0)
+        {
+            velocity[i].y*=-1;
+        }
+        else //Else apply gravity
+        {
+            velocity[i]+=gravityFrame;
+        }
+        
+        positions[i]+=velocity[i];
+        
+        
+        for (int j=0;j<posSize/3;j++)
+        {
+            posVert[i*posSize + j*3+1]+=velocity[i].y;
+        }
+    }
+
+}
+
 //Octree implementation at http://nomis80.org/code/octree.html
 //Just the data structure, but that's like 90% of the work
+
+#pragma mark GCD Functions
+
+void setupGCD()
+{
+    collisionQueue = dispatch_queue_create("com.michael.collision.collisionqueue", NULL);
+    drawQueue = dispatch_queue_create("com.michael.collision.drawqueue", NULL);
+}
+
+void runCollision()
+{
+    dispatch_async(collisionQueue, ^(void) {
+        while(1)
+        {
+            checkCollisions();
+            usleep(COLLISION_CHECK_INTERVAL);
+        }
+    });
+}
 
 
 #pragma mark Main
@@ -767,16 +838,12 @@ int main(int argc, const char * argv[])
         GetGLError();
         createUniforms();
         GetGLError();
-        //Extra Stuff Calls whatever lol
         
-        //log_gl_params();
+        //GCD Stuff
+        setupGCD();
+        runCollision();
         
         unsigned long posSize = shapes[0].mesh.positions.size();
-        
-        GetGLError();
-        
-        //Setup OpenGL so I don't have to repeated call stuff
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[0]);
         
         while(!glfwWindowShouldClose(window))
         {
@@ -784,48 +851,13 @@ int main(int argc, const char * argv[])
             double current_seconds = glfwGetTime ();
             double elapsed_seconds = current_seconds - previous_seconds;
             
-            printf("Elapsed Seconds: %f\n", elapsed_seconds);
-            
-            glm::vec3 gravityFrame = gravity * (float)elapsed_seconds;
             
             previous_seconds = current_seconds;
+            
             //Show FPS on window title, may be inefficient
             calcFPS(1, "OpenGL");
             
-            
-            for (int i=0;i<numberOfObjects;i++)
-            {
-                //velocity[i]+=gravityFrame;
-                //Apply gravity to current velocity
-                glm::vec3 tempVelocity = velocity[i]+gravityFrame;
-                
-                
-                //Check for collisions
-                glm::vec3 tempPos = positions[i];
-                
-                tempPos+=tempVelocity;
-                
-                //Flip velocity if it hits the bottom of the container
-                if (tempPos.y<=0)
-                {
-                    velocity[i].y*=-1;
-                }
-                else //Else apply gravity
-                {
-                    velocity[i]+=gravityFrame;
-                }
-                
-                positions[i]+=velocity[i];
-                
-                
-                
-                
-                for (int j=0;j<posSize/3;j++)
-                {
-                    posVert[i*posSize + j*3+1]+=velocity[i].y;
-                }
-            }
-            
+
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
             
@@ -841,7 +873,6 @@ int main(int argc, const char * argv[])
             glBufferSubData(GL_ARRAY_BUFFER, 0, posSize * numberOfObjects * sizeof(GLfloat), posVert);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[0]);
             glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size() * numberOfObjects, GL_UNSIGNED_INT, 0);
-            
 #endif
             GetGLError();
             // update other events like input handling
