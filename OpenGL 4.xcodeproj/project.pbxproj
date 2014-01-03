@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C04D695187264BF00066D8F /* Office.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4C04D694187264BF00066D8F /* Office.obj */; };
+		4C04D6971872656700066D8F /* Office.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4C04D6961872656700066D8F /* Office.mtl */; };
 		4C316DCE1855C1070025FB09 /* GLImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C316DCD1855C1070025FB09 /* GLImage.m */; };
 		4C316DD31855D16A0025FB09 /* texture.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C316DD21855D16A0025FB09 /* texture.png */; };
 		4C8FEBC71848CE4300151239 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8FEBC61848CE4300151239 /* Cocoa.framework */; };
@@ -31,6 +33,8 @@
 		4CA5AB3A186C020400ADD3EE /* Sphere_Simple.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */; };
 		4CA5AB3B186C020400ADD3EE /* Sphere_Simple.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */; };
 		4CA5AB3D186C148200ADD3EE /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5AB3C186C148200ADD3EE /* README.md */; };
+		4CC9F7A71874FC7C00CB7AE6 /* Heart.obj in Resources */ = {isa = PBXBuildFile; fileRef = 4CC9F7A51874FC7C00CB7AE6 /* Heart.obj */; };
+		4CC9F7A81874FC7C00CB7AE6 /* Heart.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 4CC9F7A61874FC7C00CB7AE6 /* Heart.mtl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +48,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C04D694187264BF00066D8F /* Office.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Office.obj; sourceTree = "<group>"; };
+		4C04D6961872656700066D8F /* Office.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Office.mtl; sourceTree = "<group>"; };
 		4C316DCC1855C1070025FB09 /* GLImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLImage.h; sourceTree = "<group>"; };
 		4C316DCD1855C1070025FB09 /* GLImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLImage.m; sourceTree = "<group>"; };
 		4C316DD21855D16A0025FB09 /* texture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = texture.png; sourceTree = "<group>"; };
@@ -75,6 +81,8 @@
 		4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Simple.obj; sourceTree = "<group>"; };
 		4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Simple.mtl; sourceTree = "<group>"; };
 		4CA5AB3C186C148200ADD3EE /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
+		4CC9F7A51874FC7C00CB7AE6 /* Heart.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Heart.obj; sourceTree = "<group>"; };
+		4CC9F7A61874FC7C00CB7AE6 /* Heart.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Heart.mtl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +171,10 @@
 		4C8FEBCD1848CE4300151239 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4CC9F7A51874FC7C00CB7AE6 /* Heart.obj */,
+				4CC9F7A61874FC7C00CB7AE6 /* Heart.mtl */,
+				4C04D6961872656700066D8F /* Office.mtl */,
+				4C04D694187264BF00066D8F /* Office.obj */,
 				4CA5AB38186C020400ADD3EE /* Sphere_Simple.obj */,
 				4CA5AB39186C020400ADD3EE /* Sphere_Simple.mtl */,
 				4CA5AB34186BFFE200ADD3EE /* Sphere.obj */,
@@ -271,17 +283,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CA5AB33186BFDD500ADD3EE /* RandomShape.obj in Resources */,
+				4C04D6971872656700066D8F /* Office.mtl in Resources */,
 				4CA5AB23186BF61400ADD3EE /* Box.mtl in Resources */,
 				4CA5AB2B186BF9F100ADD3EE /* Monkey.mtl in Resources */,
 				4CA5AB32186BFDD400ADD3EE /* RandomShape.mtl in Resources */,
 				4C8FEC061848CFEE00151239 /* fragment.fsh in Resources */,
+				4CC9F7A81874FC7C00CB7AE6 /* Heart.mtl in Resources */,
 				4CA5AB3B186C020400ADD3EE /* Sphere_Simple.mtl in Resources */,
 				4CA5AB22186BF61400ADD3EE /* Box.obj in Resources */,
 				4C8FEC071848CFF100151239 /* vertex.vsh in Resources */,
 				4CA5AB2A186BF9F100ADD3EE /* Monkey.obj in Resources */,
+				4CC9F7A71874FC7C00CB7AE6 /* Heart.obj in Resources */,
 				4CA5AB36186BFFE200ADD3EE /* Sphere.obj in Resources */,
 				4CA5AB3D186C148200ADD3EE /* README.md in Resources */,
 				4C316DD31855D16A0025FB09 /* texture.png in Resources */,
+				4C04D695187264BF00066D8F /* Office.obj in Resources */,
 				4CA5AB3A186C020400ADD3EE /* Sphere_Simple.obj in Resources */,
 				4CA5AB37186BFFE200ADD3EE /* Sphere.mtl in Resources */,
 			);

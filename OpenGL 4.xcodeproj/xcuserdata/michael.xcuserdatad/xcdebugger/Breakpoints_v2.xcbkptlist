@@ -10,29 +10,43 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OpenGL 4/main.mm"
-            timestampString = "410098855.394094"
+            timestampString = "410416685.006316"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "201"
-            endingLineNumber = "201"
-            landmarkName = "log_gl_params ()"
+            startingLineNumber = "802"
+            endingLineNumber = "802"
+            landmarkName = "main(int argc, const char * argv[])"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "OpenGL 4/fragment.fsh"
-            timestampString = "408279105.938941"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "37"
-            endingLineNumber = "37"
-            landmarkName = "main()"
-            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "OpenGL 4"
+                  urlString = "file:///Users/michael/Documents/Development/Objective-C/Experiment/Mac%20OS%20X/OpenGL/OpenGL%204/OpenGL%204/main.mm"
+                  timestampString = "410414083.924011"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "797"
+                  endingLineNumber = "797"
+                  offsetFromSymbolStart = "1203">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "OpenGL 4"
+                  urlString = "file:///Users/michael/Documents/Development/Objective-C/Experiment/Mac%20OS%20X/OpenGL/OpenGL%204/OpenGL%204/main.mm"
+                  timestampString = "410414083.924508"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "797"
+                  endingLineNumber = "797"
+                  offsetFromSymbolStart = "1239">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -42,13 +56,43 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OpenGL 4/main.mm"
-            timestampString = "410098855.394094"
+            timestampString = "410416685.006316"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
-            landmarkName = "glfw_window_size_callback (GLFWwindow* window, int width, int height)"
+            startingLineNumber = "825"
+            endingLineNumber = "825"
+            landmarkName = "main(int argc, const char * argv[])"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "OpenGL 4"
+                  urlString = "file:///Users/michael/Documents/Development/Objective-C/Experiment/Mac%20OS%20X/OpenGL/OpenGL%204/OpenGL%204/main.mm"
+                  timestampString = "410414126.54912"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "802"
+                  endingLineNumber = "802"
+                  offsetFromSymbolStart = "1310">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "OpenGL 4"
+                  urlString = "file:///Users/michael/Documents/Development/Objective-C/Experiment/Mac%20OS%20X/OpenGL/OpenGL%204/OpenGL%204/main.mm"
+                  timestampString = "410414126.54946"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "802"
+                  endingLineNumber = "802"
+                  offsetFromSymbolStart = "1346">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

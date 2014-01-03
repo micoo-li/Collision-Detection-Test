@@ -51,5 +51,5 @@ void main()
 	frag_color = vec4 (Is + Id + Ia, 1.0);
   
   //*/
-//    frag_color = vec4(Kd, 1);
+   // frag_color = vec4(Kd, 1);
 }

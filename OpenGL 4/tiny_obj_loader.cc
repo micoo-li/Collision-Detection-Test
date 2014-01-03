@@ -282,6 +282,8 @@ std::string LoadMtl (
   std::stringstream err;
 
   std::string filepath;
+    
+    printf("t: %s", filepath.c_str());
 
   if (mtl_basepath) {
     filepath = std::string(mtl_basepath) + "/" + std::string(filename);

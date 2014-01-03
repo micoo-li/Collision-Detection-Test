@@ -80,8 +80,11 @@ vector<tinyobj::shape_t> shapes;
 
 GLfloat *posVert;
 GLfloat *normalVert;
-unsigned int *indices;
 
+//vector<glm::vec3> posVert;
+//vector<glm::vec3> normalVert;
+
+unsigned int *indices;
 
 float diameter = 2; //Diameter of sphere
 int containerSize = 40; //Size of the box that contains the spheres
@@ -100,6 +103,8 @@ unsigned int shaderProgram;
 
 vector<glm::vec3> positions;
 vector<glm::vec3> velocity;
+
+static glm::vec3 gravity = glm::vec3(0, -1, 0); //Acceleration of velocity of each ball.
 
 
 unsigned int tex = 0;
@@ -131,7 +136,8 @@ float camYaw = 0; //O Degrees
 #define GL_LOG_FILE "/Users/michael/Desktop/gl.log"
 
 #define SHOULD_FULLSCREEN 0 //0 for window mode, 1 for fullscreen mode
-#define BATCH_DRAWING 0 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
+#define BATCH_DRAWING 1 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
+//Note: Non batched will not support moving vertices, only implemented for batched
 
 
 #pragma mark Window Functions
@@ -139,7 +145,6 @@ float camYaw = 0; //O Degrees
 void glfw_window_size_callback (GLFWwindow* window, int width, int height) {
     g_gl_width = width;
     g_gl_height = height;
-    NSLog (@"Test");
     /* update any perspective matrices used here */
 }
 
@@ -295,7 +300,7 @@ void loadObj()
 {
     //Load OBJ File, aka the sphere
     
-    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere" ofType:@"obj"];
+    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere_Simple" ofType:@"obj"];
     
     string err = tinyobj::LoadObj(shapes, [input UTF8String], [[input stringByDeletingLastPathComponent] UTF8String]);
     if (!err.empty())
@@ -392,10 +397,9 @@ void initializeWindow()
     
     
     //Positions of the objects, will change later
-    /*
+  /*
     positions.push_back(glm::vec3(-2, 0, -2));
     positions.push_back(glm::vec3(2, 0, -2));
-    
     positions.push_back(glm::vec3(-8, 0, 0));
     positions.push_back(glm::vec3(-8, 4, 0));
     positions.push_back(glm::vec3(-8, 8, 0));
@@ -423,8 +427,13 @@ void initializeWindow()
     
     for (int i=0;i<numberOfObjects;i++)
     {
-        positions.push_back(glm::vec3(((signed int)arc4random())%containerSize-containerSize/2, ((signed int)arc4random())%containerSize-containerSize/2, ((signed int)arc4random())%containerSize-containerSize/2));
+        positions.push_back(glm::vec3(((signed int)arc4random())%containerSize-containerSize/2, arc4random()%containerSize, ((signed int)arc4random())%containerSize-containerSize/2));
+        
+        velocity.push_back(glm::vec3(0, 0, 0)); //Change this to perhaps a random velocity later, or read velocity from input to have consistent results
     }
+    
+    printf("%lu", velocity.size());
+    
     
 #if !BATCH_DRAWING
     printf("Not Batch");
@@ -520,6 +529,11 @@ void initializeBuffers()
     
     posVert = (GLfloat *)malloc(shapes[0].mesh.positions.size() * sizeof(GLfloat) * numberOfObjects);
     normalVert = (GLfloat *)malloc(shapes[0].mesh.normals.size() * sizeof(GLfloat)* numberOfObjects);
+    
+    //posVert.reserve(shapes[0].mesh.positions.size()/3);
+    //normalVert.reserve(shapes[0].mesh.normals.size()/3);
+    
+    
     indices = (unsigned int *)malloc(shapes[0].mesh.indices.size() * sizeof(unsigned int) * numberOfObjects);
     
     unsigned long posSize = shapes[0].mesh.positions.size();
@@ -530,12 +544,16 @@ void initializeBuffers()
     {
         for (int j=0;j<posSize/3;j++)
         {
+            //posVert[j] = glm::vec3(shapes[0].mesh.positions[j*3] + positions[i].x, shapes[0].mesh.positions[j*3+1] + positions[i].y, shapes[0].mesh.positions[j*3+2] + positions[i].z);
+            
             posVert[i*posSize + j*3] = shapes[0].mesh.positions[j*3] + positions[i].x;
             posVert[i*posSize + j*3 + 1] = shapes[0].mesh.positions[j*3+1] + positions[i].y;
             posVert[i*posSize + j*3 + 2] = shapes[0].mesh.positions[j*3+2] + positions[i].z;
         }
         for (int j=0;j<normSize/3;j++)
         {
+            //normalVert[j] = glm::vec3(shapes[0].mesh.normals[j*3], shapes[0].mesh.normals[j*3+1], shapes[0].mesh.normals[j*3+2]);
+            
             //Add translation later lol
             normalVert[i*posSize + j*3] = shapes[0].mesh.normals[j*3];
             normalVert[i*posSize + j*3 + 1] = shapes[0].mesh.normals[j*3+1];
@@ -546,6 +564,7 @@ void initializeBuffers()
             indices[i*indicesSize + j] = shapes[0].mesh.indices[j]+(unsigned int)(i*posSize/3);
         }
     }
+    
     
     
     glGenBuffers(1, &verticesVBO[0]);
@@ -560,7 +579,6 @@ void initializeBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, elementsVBO[0]);
     glBufferData(GL_ARRAY_BUFFER, indicesSize * numberOfObjects * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
-    PRINT_ARRAY(indices, 72);
     
     
 #endif
@@ -753,38 +771,76 @@ int main(int argc, const char * argv[])
         
         //log_gl_params();
         
+        unsigned long posSize = shapes[0].mesh.positions.size();
+        
         GetGLError();
+        
+        //Setup OpenGL so I don't have to repeated call stuff
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[0]);
+        
         while(!glfwWindowShouldClose(window))
         {
-            GetGLError();
             static double previous_seconds = glfwGetTime ();
             double current_seconds = glfwGetTime ();
             double elapsed_seconds = current_seconds - previous_seconds;
+            
+            printf("Elapsed Seconds: %f\n", elapsed_seconds);
+            
+            glm::vec3 gravityFrame = gravity * (float)elapsed_seconds;
+            
             previous_seconds = current_seconds;
-            GetGLError();
             //Show FPS on window title, may be inefficient
             calcFPS(1, "OpenGL");
-            GetGLError();
+            
+            
+            for (int i=0;i<numberOfObjects;i++)
+            {
+                //velocity[i]+=gravityFrame;
+                //Apply gravity to current velocity
+                glm::vec3 tempVelocity = velocity[i]+gravityFrame;
+                
+                
+                //Check for collisions
+                glm::vec3 tempPos = positions[i];
+                
+                tempPos+=tempVelocity;
+                
+                //Flip velocity if it hits the bottom of the container
+                if (tempPos.y<=0)
+                {
+                    velocity[i].y*=-1;
+                }
+                else //Else apply gravity
+                {
+                    velocity[i]+=gravityFrame;
+                }
+                
+                positions[i]+=velocity[i];
+                
+                
+                
+                
+                for (int j=0;j<posSize/3;j++)
+                {
+                    posVert[i*posSize + j*3+1]+=velocity[i].y;
+                }
+            }
+            
             glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
-
             
 #if !BATCH_DRAWING
-            NSLog (@"Start");
             for (int i=0;i<numberOfObjects;i++)
             {
                 glBindVertexArray(vao[i]);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[i]);
                 glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
             }
-            NSLog (@"End");
 #else
-            NSLog (@"Start");
-            glBindVertexArray(vao[0]);
+            glBindBuffer(GL_ARRAY_BUFFER, verticesVBO[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, posSize * numberOfObjects * sizeof(GLfloat), posVert);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsVBO[0]);
             glDrawElements(GL_TRIANGLES, (GLsizei)shapes[0].mesh.indices.size() * numberOfObjects, GL_UNSIGNED_INT, 0);
-            NSLog (@"End");
-            
             
 #endif
             GetGLError();
@@ -829,6 +885,16 @@ int main(int argc, const char * argv[])
             }
             if (glfwGetKey (window, GLFW_KEY_RIGHT)) {
                 camYaw -= camYawSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey(window, GLFW_KEY_UP))
+            {
+                camPosition[1] += camSpeed * elapsed_seconds;
+                cam_moved = true;
+            }
+            if (glfwGetKey(window, GLFW_KEY_DOWN))
+            {
+                camPosition[1] -= camSpeed * elapsed_seconds;
                 cam_moved = true;
             }
             
