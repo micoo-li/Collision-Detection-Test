@@ -55,11 +55,11 @@ using namespace boost;
 #define BATCH_DRAWING 1 //0 for no batch (multiple VBO), 1 for batch drawing (1 VBO)
 //None batch probably doesn't work anymore
 
-#define COLLISION_DETECTION_METHOD 3 //-1 for nothing, 0 for nested loop, 1 for grid, 2 for 1 axis sweep and prune, 3 for 3 axis sweep and prune
+#define COLLISION_DETECTION_METHOD 2 //-1 for nothing, 0 for nested loop, 1 for grid, 2 for 1 axis sweep and prune, 3 for 3 axis sweep and prune
 
-#define COLLISION_CHECK_INTERVAL_CHANGE 100 //In microseconds (or .000001 seconds)
+#define COLLISION_CHECK_INTERVAL_CHANGE 000 //In microseconds (or .000001 seconds)
 #define FPS 0.016666666 //Frames per second, less calculation
-unsigned int COLLISION_CHECK_INTERVAL = 0000;
+unsigned int COLLISION_CHECK_INTERVAL = 5000;
 
 
 //Note: Non batched will not support moving vertices, only implemented for batched
@@ -78,7 +78,7 @@ GLfloat *normalVert;
 unsigned int *indices;
 
 float diameter = 2; //Diameter of sphere
-int containerSize = 8; //Size of the box that contains the spheres
+int containerSize = 1024; //Size of the box that contains the spheres
 //Has to be powers of 2 in order for octree to work
 int maxVelocity = 10;
 
@@ -87,7 +87,7 @@ dispatch_queue_t collisionQueue;
 dispatch_queue_t drawQueue;
 
 //Important variables
-GLint numberOfObjects = 10;
+GLint numberOfObjects = 10000;
 
 GLFWwindow *window;
 unsigned int *verticesVBO;
@@ -244,7 +244,7 @@ void loadObj()
 {
     //Load OBJ File, aka the sphere
     
-    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere" ofType:@"obj"];
+    NSString *input = [[NSBundle mainBundle] pathForResource:@"Sphere_Simple" ofType:@"obj"];
     
     string err = tinyobj::LoadObj(shapes, [input UTF8String], [[input stringByDeletingLastPathComponent] UTF8String]);
     if (!err.empty())
@@ -333,32 +333,14 @@ void initializeWindow()
     positions.push_back(glm::vec3(8, 8, 0));
      */
     
-    /*
-     positions.push_back(glm::vec3(
-     */
-
-/*
-    for (int x = 0 ;x<containerSize/gridSize;x++)
-    {
-        grid.push_back(<#const_reference __x#>)
-        for (int y=0;y<containerSize/gridSize;y++)
-        {
-            for(int z=0;z<containerSize/gridSize;z++)
-            {
-                
-            }
-        }
-    }
-*/
-    /*
- 
-     positions.push_back(glm::vec3(3, 3, 3));
-     positions.push_back(glm::vec3(3, 10, 3));
+ /*
+     positions.push_back(glm::vec3(4.414213562, 3, 0));
+     positions.push_back(glm::vec3(3, 10, 0));
      
-     velocity.push_back(glm::vec3(1, 0, 0));
      velocity.push_back(glm::vec3(0, 0, 0));
-   */
-    
+     velocity.push_back(glm::vec3(0, 0, 0));
+  */
+  
     
     for (int i=0;i<numberOfObjects;i++)
     {
@@ -375,7 +357,7 @@ void initializeWindow()
         velocity.push_back(glm::vec3(arc4random()%maxVelocity, 0, arc4random()%maxVelocity));
         
     }
-    
+   
     collisions = (int*)malloc(numberOfObjects*sizeof(int));
     
     for (int i=0;i<numberOfObjects;i++)
@@ -755,10 +737,21 @@ void collisionHappened(int objectOne, int objectTwo)
     //never mind you only swap the velocities cuz of the same mass
     if (collisions[objectOne] != objectTwo)
     {
+        glm::vec3 posOne = positions[objectOne];
+        glm::vec3 posTwo = positions[objectTwo];
+        
         glm::vec3 velOne = velocity[objectOne];
+        glm::vec3 velTwo = velocity[objectTwo];
+        
+        glm::vec3 newVelTwo = glm::normalize(posTwo - posOne) * glm::length(velTwo);
+        glm::vec3 newVelOne = glm::normalize(posOne - posTwo) * glm::length(velOne);
 
-        velocity[objectOne] = velocity[objectTwo];
-        velocity[objectTwo] = velOne;
+        //velocity[objectOne] = velocity[objectTwo];
+        //velocity[objectTwo] = velOne;
+        
+        velocity[objectOne] = newVelOne;
+        velocity[objectTwo] = newVelTwo;
+        
     }
 }
 
@@ -1061,13 +1054,22 @@ void checkCollisions() //Main Collision Function
         
         
         //Checks for wall collisions
-        if (tempPos.x<0+1 || tempPos.x>containerSize-1) //Half of a radius
+        if (tempPos.x<0+radius) //Half of a radius
         {
-            velocity[i].x*=-1;
+            velocity[i].x=abs(velocity[i].x);
         }
-        if (tempPos.z<0+1 || tempPos.z>(containerSize-1))
+        else if (tempPos.x>containerSize-radius)
         {
-            velocity[i].z*=-1;
+            velocity[i].x=abs(velocity[i].x)*-1;
+        }
+        
+        if (tempPos.z<0+ radius)
+        {
+            velocity[i].z=abs(velocity[i].z);
+        }
+        else if (tempPos.z>containerSize-1)
+        {
+            velocity[i].z=abs(velocity[i].z)*-1;
         }
         
         

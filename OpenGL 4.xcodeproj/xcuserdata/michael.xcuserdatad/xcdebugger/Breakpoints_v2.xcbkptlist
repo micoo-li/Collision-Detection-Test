@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OpenGL 4/main.mm"
-            timestampString = "413855771.58514"
+            timestampString = "414401877.666605"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "863"
-            endingLineNumber = "863">
+            startingLineNumber = "850"
+            endingLineNumber = "850">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -24,13 +24,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OpenGL 4/main.mm"
-            timestampString = "413855771.58514"
+            timestampString = "414401877.666605"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "799"
-            endingLineNumber = "799"
-            landmarkName = "collisionOctree()"
-            landmarkType = "7">
+            startingLineNumber = "786"
+            endingLineNumber = "786">
             <Locations>
                <Location
                   shouldBeEnabled = "No"
@@ -61,22 +59,6 @@
                   offsetFromSymbolStart = "614">
                </Location>
             </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "OpenGL 4/main.mm"
-            timestampString = "413818749.240134"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "345"
-            endingLineNumber = "345"
-            landmarkName = "initializeWindow()"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
